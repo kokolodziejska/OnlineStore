@@ -1,0 +1,63 @@
+﻿@model OnlineStore.Domain.Models.Product
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit Product</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <input type="hidden" asp-for="ProductId" />
+            <input type="hidden" asp-for="ProductDetail.ProductDetailId" />
+
+            <div class="form-group">
+                <label asp-for="Name"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Price"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CategoryId"></label>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+
+            <h4>Product Details</h4>
+            <div class="form-group">
+                <label asp-for="ProductDetail.Description"></label>
+                <textarea asp-for="ProductDetail.Description" class="form-control"></textarea>
+                <span asp-validation-for="ProductDetail.Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ProductDetail.Specifications"></label>
+                <textarea asp-for="ProductDetail.Specifications" class="form-control"></textarea>
+                <span asp-validation-for="ProductDetail.Specifications" class="text-danger"></span>
+            </div>
+
+            <button type="submit" name="Save" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index" name="Back to List" class="btn btn-info">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

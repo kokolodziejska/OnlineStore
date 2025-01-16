@@ -1,0 +1,28 @@
+﻿@model OnlineStore.Domain.Models.Product
+
+@{
+    ViewData["Title"] = "Product Details";
+}
+
+<h1>Product Details</h1>
+
+<div>
+    <h3>@Model.Name</h3>
+    <p><strong>Price:</strong> @Model.Price</p>
+    <p><strong>Category:</strong> @Model.Category.Name</p>
+
+    @if (Model.ProductDetail != null)
+    {
+        <h4>Product Details</h4>
+        <p><strong>Description:</strong> @Model.ProductDetail.Description</p>
+        <p><strong>Specifications:</strong> @Model.ProductDetail.Specifications</p>
+    }
+    else
+    {
+        <p><em>No additional details available for this product.</em></p>
+    }
+</div>
+
+<div>
+    <a asp-action="Index" name="Back to List" class="btn btn-info">Back to List</a>
+</div>

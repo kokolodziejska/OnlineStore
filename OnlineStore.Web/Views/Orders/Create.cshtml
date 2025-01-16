@@ -1,0 +1,139 @@
+﻿@model OnlineStore.Domain.Models.Order
+
+@{
+    ViewData["Title"] = "Create Order";
+}
+
+<h1>Create Order</h1>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="CustomerName" class="control-label">Customer Name</label>
+        <input asp-for="CustomerName" class="form-control" placeholder="Enter customer's name" />
+        <span asp-validation-for="CustomerName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="OrderDate" class="control-label">Order Date</label>
+        <input asp-for="OrderDate" class="form-control" type="date" />
+        <span asp-validation-for="OrderDate" class="text-danger"></span>
+    </div>
+
+    <hr />
+
+    <h4>Order Products</h4>
+    <table class="table" id="productsTable">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th style="width: 150px;">Quantity</th>
+                <th style="width: 100px;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <select name="productIds" class="form-control" required>
+                        <option value="">-- Select Product --</option>
+                        @foreach (var product in ViewData["Products"] as IEnumerable<SelectListItem>)
+                        {
+                            <option value="@product.Value">@product.Text</option>
+                        }
+                    </select>
+                </td>
+                <td>
+                    <input name="quantities" class="form-control" type="number" min="1" value="1" />
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger remove-product">Remove</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button type="button" id="addProductButton" class="btn btn-secondary mb-3">Add Another Product</button>
+
+    <div class="form-group mt-3">
+        <input type="submit" value="Create Order" class="btn btn-primary" />
+    </div>
+</form>
+
+@foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+{
+    <div class="text-danger">@error.ErrorMessage</div>
+}
+
+@section Scripts {
+    <script>
+        const allProducts = [];
+        @foreach (var product in ViewData["Products"] as IEnumerable<SelectListItem>)
+        {
+            <text>
+                    allProducts.push({ value: "@product.Value", text: "@product.Text" });
+            </text>
+        }
+
+        function updateProductOptions() {
+            const selectedProductIds = Array.from(document.querySelectorAll('select[name="productIds"]'))
+                .map(select => select.value)
+                .filter(value => value !== "");
+
+            const selects = document.querySelectorAll('select[name="productIds"]');
+            selects.forEach(select => {
+                const currentValue = select.value;
+
+                while (select.options.length > 0) {
+                    select.remove(0);
+                }
+
+                const defaultOption = document.createElement('option');
+                defaultOption.value = "";
+                defaultOption.text = "-- Select Product --";
+                select.add(defaultOption);
+
+                allProducts.forEach(product => {
+                    if (product.value === currentValue || !selectedProductIds.includes(product.value)) {
+                        const option = document.createElement('option');
+                        option.value = product.value;
+                        option.text = product.text;
+                        select.add(option);
+                    }
+                });
+                select.value = currentValue;
+            });
+        }
+
+        function attachSelectChangeEvents() {
+            const selects = document.querySelectorAll('select[name="productIds"]');
+            selects.forEach(select => {
+                select.addEventListener('change', function () {
+                    updateProductOptions();
+                });
+            });
+        }
+
+        document.getElementById("addProductButton").addEventListener("click", function () {
+            const tableBody = document.querySelector("#productsTable tbody");
+            const newRow = tableBody.rows[0].cloneNode(true);
+            newRow.querySelector('select').value = "";
+            newRow.querySelector('input').value = "1";
+            tableBody.appendChild(newRow);
+            attachSelectChangeEvents();
+            updateProductOptions();
+        });
+
+        document.getElementById("productsTable").addEventListener("click", function (event) {
+            if (event.target.classList.contains("remove-product")) {
+                const row = event.target.closest("tr");
+                if (document.querySelectorAll("#productsTable tbody tr").length > 1) {
+                    row.remove();
+                    updateProductOptions();
+                } else {
+                    alert("At least one product must be added.");
+                }
+            }
+        });
+        attachSelectChangeEvents();
+        updateProductOptions();
+    </script>
+}
